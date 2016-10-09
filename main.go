@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"io"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -253,6 +254,7 @@ func create(root *Node, out io.Writer, done *map[string]bool) {
 	}
 	var p = root
 	for p != nil {
+		log.Println(p.Path())
 		if !(*done)[p.Path()] {
 			if p.IsFolder {
 				err = templ2.Execute(out, p)
@@ -333,9 +335,10 @@ func main() {
 	}
 	for _, node := range roots {
 		func(node *Node) {
-			file := "fsdb_" + strings.ToLower(node.Name) + "_record" + ".go"
+			s := "fsdb_" + strings.Replace(node.Path(), "/", "_", -1)
+			file := s + "_record" + ".go"
 			if node.Target != "" {
-				file = "fsdb_" + strings.ToLower(node.Target) + ".go"
+				file = s + "_" + strings.ToLower(node.Target) + ".go"
 			}
 			f, err := os.OpenFile(path.Join(*outFolder, file), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
 			if err != nil {
